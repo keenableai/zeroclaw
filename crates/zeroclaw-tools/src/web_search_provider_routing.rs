@@ -7,6 +7,7 @@ pub enum WebSearchProviderRoute {
     Jina,
     Bocha,
     AnySearch,
+    Serply,
     Keenable,
 }
 
@@ -47,6 +48,7 @@ const TAVILY_PROVIDER: &str = "tavily";
 const JINA_PROVIDER: &str = "jina";
 const BOCHA_PROVIDER: &str = "bocha";
 const ANYSEARCH_PROVIDER: &str = "anysearch";
+const SERPLY_PROVIDER: &str = "serply";
 const KEENABLE_PROVIDER: &str = "keenable";
 
 pub fn resolve_web_search_provider(raw_model_provider: &str) -> WebSearchProviderResolution {
@@ -91,6 +93,13 @@ pub fn resolve_web_search_provider(raw_model_provider: &str) -> WebSearchProvide
             canonical_provider: ANYSEARCH_PROVIDER,
             used_fallback: false,
         },
+        "serply" | "serply-search" | "serply_search" | "serply-io" | "serply_io" => {
+            WebSearchProviderResolution {
+                route: WebSearchProviderRoute::Serply,
+                canonical_provider: SERPLY_PROVIDER,
+                used_fallback: false,
+            }
+        }
         "keenable" | "keenable-search" | "keenable_search" => WebSearchProviderResolution {
             route: WebSearchProviderRoute::Keenable,
             canonical_provider: KEENABLE_PROVIDER,
@@ -189,6 +198,23 @@ mod tests {
             let resolved = resolve_web_search_provider(alias);
             assert_eq!(resolved.route, WebSearchProviderRoute::AnySearch);
             assert_eq!(resolved.canonical_provider, ANYSEARCH_PROVIDER);
+            assert!(!resolved.used_fallback);
+        }
+    }
+
+    #[test]
+    fn resolve_aliases_to_serply() {
+        let serply_aliases = [
+            "serply",
+            "serply-search",
+            "serply_search",
+            "serply-io",
+            "serply_io",
+        ];
+        for alias in serply_aliases {
+            let resolved = resolve_web_search_provider(alias);
+            assert_eq!(resolved.route, WebSearchProviderRoute::Serply);
+            assert_eq!(resolved.canonical_provider, SERPLY_PROVIDER);
             assert!(!resolved.used_fallback);
         }
     }
